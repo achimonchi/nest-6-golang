@@ -23,6 +23,7 @@ func NewRouter(router *httprouter.Router, user *controller.UserHandler) *Router 
 func (r *Router) Start(port string) {
 	r.router.GET("/employees", r.user.GetUsers)
 	r.router.POST("/employees/register", r.user.Register)
+	r.router.POST("/employees/login", r.user.Login)
 
 	log.Println("server running at port", port)
 	http.ListenAndServe(port, r.router)

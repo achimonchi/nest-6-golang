@@ -18,12 +18,12 @@ type UserFindAllResponse struct {
 	Id       string `json:"id"`
 	Fullname string `json:"fullname"`
 	Email    string `json:"email"`
-	Photo    string `json:"photo"`
+	Address  string `json:"address"`
 }
 
-func NewUserFindAllResponse(users []model.User) []UserFindAllResponse {
+func NewUserFindAllResponse(users *[]model.User) []UserFindAllResponse {
 	var usersFind []UserFindAllResponse
-	for _, user := range users {
+	for _, user := range *users {
 		usersFind = append(usersFind, *parseModelToUserFind(&user))
 	}
 	return usersFind
@@ -34,5 +34,6 @@ func parseModelToUserFind(user *model.User) *UserFindAllResponse {
 		Id:       user.Id,
 		Fullname: user.Fullname,
 		Email:    user.Email,
+		Address:  user.Address,
 	}
 }

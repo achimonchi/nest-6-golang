@@ -3,7 +3,6 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
-	"sesi4/server/model"
 	"sesi4/server/params"
 	"sesi4/server/service"
 	"sesi4/server/view"
@@ -23,19 +22,7 @@ func NewUserHandler(svc *service.UserServices) *UserHandler {
 
 func (u *UserHandler) GetUsers(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
-	users := model.Users
-
-	if len(users) == 0 {
-		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"error": "NOT_FOUND",
-		})
-		return
-	}
-
-	usersFind := view.NewUserFindAllResponse(users)
-
-	resp := view.SuccessFindAll(usersFind)
+	resp := u.svc.GetUsers()
 
 	WriteJsonResponse(w, resp)
 
@@ -58,5 +45,18 @@ func (u *UserHandler) Register(w http.ResponseWriter, r *http.Request, _ httprou
 	}
 
 	resp := u.svc.CreateUser(&req)
+	WriteJsonResponse(w, resp)
+}
+
+func (u *UserHandler) Login(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	var req params.UserLogin
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		resp := view.ErrBadRequest(err.Error())
+		WriteJsonResponse(w, resp)
+		return
+	}
+
+	resp := u.svc.Login(&req)
 	WriteJsonResponse(w, resp)
 }

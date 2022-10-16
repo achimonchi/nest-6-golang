@@ -22,7 +22,7 @@ func (u *userRepo) GetUsers() (*[]model.User, error) {
 			id, nip, name, address, 
 			email, created_at, updated_at
 		FROM
-			employees
+			employees 
 	`
 
 	stmt, err := u.db.Prepare(query)
@@ -42,7 +42,7 @@ func (u *userRepo) GetUsers() (*[]model.User, error) {
 	for rows.Next() {
 		var user model.User
 		err := rows.Scan(
-			&user.Id, &user.Nip, &user.Address,
+			&user.Id, &user.Nip, &user.Fullname, &user.Address,
 			&user.Email, &user.CreatedAt, &user.UpdatedAt,
 		)
 		if err != nil {
@@ -62,7 +62,7 @@ func (u *userRepo) Register(user *model.User) error {
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback()
+	tx.Rollback()
 	query := `
 		INSERT INTO employees (
 			id, nip, name, address, email, password, created_at, updated_at
@@ -76,7 +76,7 @@ func (u *userRepo) Register(user *model.User) error {
 		return err
 	}
 
-	defer stmt.Close()
+	stmt.Close()
 
 	_, err = stmt.Exec(
 		user.Id, user.Nip, user.Fullname, user.Address,
@@ -93,4 +93,33 @@ func (u *userRepo) Register(user *model.User) error {
 	}
 
 	return nil
+}
+
+func (u *userRepo) FindUserByEmail(email string) (*model.User, error) {
+	query := `
+		SELECT 
+			id, nip, name, address, password,
+			email, created_at, updated_at
+		FROM
+			employees 
+		WHERE email=$1
+	`
+	stmt, err := u.db.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+
+	defer stmt.Close()
+
+	row := stmt.QueryRow(email)
+	var user model.User
+
+	err = row.Scan(
+		&user.Id, &user.Nip, &user.Fullname, &user.Address,
+		&user.Password, &user.Email, &user.CreatedAt, &user.UpdatedAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
 }

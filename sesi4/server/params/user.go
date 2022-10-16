@@ -14,6 +14,10 @@ type UserUpdate struct {
 	Email    string
 	Password string
 }
+type UserLogin struct {
+	Email    string
+	Password string
+}
 
 func (u *UserCreate) ParseToModel() *model.User {
 	return &model.User{

@@ -35,3 +35,15 @@ func ErrInternalServer(err interface{}) *Response {
 		Error:  err,
 	}
 }
+func ErrNotFound() *Response {
+	return &Response{
+		Status: http.StatusNotFound,
+		Error:  "NO_DATA",
+	}
+}
+func ErrUnauthorized() *Response {
+	return &Response{
+		Status: http.StatusUnauthorized,
+		Error:  "UNAUTHORIZED",
+	}
+}
