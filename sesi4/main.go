@@ -4,6 +4,8 @@ import (
 	"log"
 	"sesi4/db"
 	"sesi4/server"
+
+	"github.com/julienschmidt/httprouter"
 )
 
 func main() {
@@ -15,5 +17,10 @@ func main() {
 	if db != nil {
 		log.Println("db connected")
 	}
-	server.Start(":4000")
+
+	router := httprouter.New()
+
+	app := server.NewRouter(router)
+
+	app.Start(":4000")
 }

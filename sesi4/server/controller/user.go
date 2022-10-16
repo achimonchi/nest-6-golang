@@ -7,9 +7,11 @@ import (
 	"sesi4/server/params"
 	"sesi4/server/service"
 	"sesi4/server/view"
+
+	"github.com/julienschmidt/httprouter"
 )
 
-func GetUsers(w http.ResponseWriter, r *http.Request) {
+func GetUsers(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 	users := model.Users
 
@@ -31,7 +33,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	// })
 }
 
-func Register(w http.ResponseWriter, r *http.Request) {
+func Register(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var req params.UserCreate
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
