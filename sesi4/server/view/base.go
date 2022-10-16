@@ -28,3 +28,10 @@ func ErrBadRequest(err interface{}) *Response {
 		Error:  err,
 	}
 }
+
+func ErrInternalServer(err interface{}) *Response {
+	return &Response{
+		Status: http.StatusInternalServerError,
+		Error:  err,
+	}
+}

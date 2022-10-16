@@ -3,7 +3,7 @@ package model
 import "time"
 
 type BaseModel struct {
-	Id        int `json:"id"`
+	Id        string `json:"id"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -11,10 +11,8 @@ type User struct {
 	BaseModel
 	Fullname string `json:"fullname"`
 	Email    string `json:"email"`
-	Age      string
-	Contact  string
-	Address  string
-	Photo    string
+	Nip      string `json:"nip"`
+	Address  string `json:"address"`
 	Password string `json:"password"`
 }
 

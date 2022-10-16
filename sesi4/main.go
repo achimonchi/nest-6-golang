@@ -1,9 +1,11 @@
 package main
 
 import (
-	"log"
 	"sesi4/db"
 	"sesi4/server"
+	"sesi4/server/controller"
+	"sesi4/server/repository/postgres"
+	"sesi4/server/service"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -14,13 +16,13 @@ func main() {
 		panic(err)
 	}
 
-	if db != nil {
-		log.Println("db connected")
-	}
+	userRepo := postgres.NewUserRepo(db)
+	userSvc := service.NewServices(userRepo)
+	userHandler := controller.NewUserHandler(userSvc)
 
 	router := httprouter.New()
 
-	app := server.NewRouter(router)
+	app := server.NewRouter(router, userHandler)
 
 	app.Start(":4000")
 }

@@ -15,7 +15,7 @@ func NewUserCreateResponse(user *model.User) *UserCreateResponse {
 }
 
 type UserFindAllResponse struct {
-	Id       int    `json:"id"`
+	Id       string `json:"id"`
 	Fullname string `json:"fullname"`
 	Email    string `json:"email"`
 	Photo    string `json:"photo"`
@@ -34,6 +34,5 @@ func parseModelToUserFind(user *model.User) *UserFindAllResponse {
 		Id:       user.Id,
 		Fullname: user.Fullname,
 		Email:    user.Email,
-		Photo:    user.Photo,
 	}
 }

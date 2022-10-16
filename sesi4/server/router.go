@@ -10,17 +10,19 @@ import (
 
 type Router struct {
 	router *httprouter.Router
+	user   *controller.UserHandler
 }
 
-func NewRouter(router *httprouter.Router) *Router {
+func NewRouter(router *httprouter.Router, user *controller.UserHandler) *Router {
 	return &Router{
 		router: router,
+		user:   user,
 	}
 }
 
 func (r *Router) Start(port string) {
-	r.router.GET("/users", controller.GetUsers)
-	r.router.POST("/users", controller.Register)
+	r.router.GET("/employees", r.user.GetUsers)
+	r.router.POST("/employees/register", r.user.Register)
 
 	log.Println("server running at port", port)
 	http.ListenAndServe(port, r.router)

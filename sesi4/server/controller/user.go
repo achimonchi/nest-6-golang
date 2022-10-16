@@ -11,7 +11,17 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func GetUsers(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+type UserHandler struct {
+	svc *service.UserServices
+}
+
+func NewUserHandler(svc *service.UserServices) *UserHandler {
+	return &UserHandler{
+		svc: svc,
+	}
+}
+
+func (u *UserHandler) GetUsers(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	w.Header().Set("Content-Type", "application/json")
 	users := model.Users
 
@@ -28,12 +38,10 @@ func GetUsers(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	resp := view.SuccessFindAll(usersFind)
 
 	WriteJsonResponse(w, resp)
-	// json.NewEncoder(w).Encode(map[string]interface{}{
-	// 	"payload": users,
-	// })
+
 }
 
-func Register(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (u *UserHandler) Register(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var req params.UserCreate
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
@@ -49,6 +57,6 @@ func Register(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		return
 	}
 
-	resp := service.CreateUser(&req)
+	resp := u.svc.CreateUser(&req)
 	WriteJsonResponse(w, resp)
 }
