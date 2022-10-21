@@ -16,10 +16,4 @@ type User struct {
 	Password string `json:"password"`
 }
 
-type Product struct {
-	BaseModel
-	Name  string
-	Stock int
-}
-
 var Users = []User{}

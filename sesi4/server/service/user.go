@@ -69,5 +69,15 @@ func (u *UserServices) Login(req *params.UserLogin) *view.Response {
 		return view.ErrUnauthorized()
 	}
 
-	return view.SuccessCreated(user)
+	token := helper.Token{
+		UserId: user.Id,
+		Email:  user.Email,
+	}
+
+	tokString, err := helper.CreateToken(&token)
+	if err != nil {
+		return view.ErrInternalServer(err.Error())
+	}
+
+	return view.SuccessCreated(tokString)
 }

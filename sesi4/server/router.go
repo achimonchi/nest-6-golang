@@ -12,11 +12,13 @@ import (
 type Router struct {
 	router *httprouter.Router
 	user   *controller.UserHandler
+	menu   *controller.MenuHandler
 }
 
 type GinRouter struct {
 	router *gin.Engine
 	user   *controller.UserHandler
+	menu   *controller.MenuHandler
 }
 
 func NewRouter(router *httprouter.Router, user *controller.UserHandler) *Router {
@@ -25,10 +27,11 @@ func NewRouter(router *httprouter.Router, user *controller.UserHandler) *Router 
 		user:   user,
 	}
 }
-func NewRouterGin(router *gin.Engine, user *controller.UserHandler) *GinRouter {
+func NewRouterGin(router *gin.Engine, user *controller.UserHandler, menu *controller.MenuHandler) *GinRouter {
 	return &GinRouter{
 		router: router,
 		user:   user,
+		menu:   menu,
 	}
 }
 
@@ -46,6 +49,10 @@ func (r *GinRouter) Start(port string) {
 	emp.GET("/", r.user.GinGetUsers)
 	emp.POST("/register", r.user.GinRegister)
 	emp.POST("/login", r.user.GinLogin)
+
+	menu := r.router.Group("/menus")
+	menu.POST("/", r.menu.CreateMenu)
+	menu.GET("/id/:menuId", r.menu.GetMenuById)
 
 	r.router.Run(port)
 }

@@ -20,12 +20,16 @@ func main() {
 	userSvc := service.NewServices(userRepo)
 	userHandler := controller.NewUserHandler(userSvc)
 
+	menuRepo := gorm_postgres.NewMenuRepoGormPostgres(db)
+	menuSvc := service.NewMenuServices(menuRepo)
+	menuHandler := controller.NewMenuHandler(menuSvc)
+
 	// router := httprouter.New()
-	router := gin.New()
+	router := gin.Default()
 	router.Use(gin.Logger())
 
 	// app := server.NewRouter(router, userHandler)
-	app := server.NewRouterGin(router, userHandler)
+	app := server.NewRouterGin(router, userHandler, menuHandler)
 
 	app.Start(":4444")
 }

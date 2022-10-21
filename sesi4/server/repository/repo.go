@@ -7,3 +7,9 @@ type UserRepo interface {
 	Register(user *model.User) error
 	FindUserByEmail(email string) (*model.User, error)
 }
+
+type MenuRepo interface {
+	GetMenus() (*[]model.Menu, error)
+	CreateMenu(m *model.Menu) error
+	GetMenuById(menuId string) (*model.Menu, error)
+}
