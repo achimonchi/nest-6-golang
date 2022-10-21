@@ -1,13 +1,31 @@
 package params
 
-import "sesi4/server/model"
+import (
+	"errors"
+	"sesi4/server/model"
+
+	"github.com/go-playground/validator/v10"
+)
 
 type UserCreate struct {
-	Fullname string
-	Email    string
-	Password string
-	Address  string
-	NIP      string
+	Fullname string `validate:"required"`
+	Email    string `validate:"required"`
+	Password string `validate:"required"`
+	Address  string `validate:"required"`
+	NIP      string `validate:"required"`
+}
+
+func Validate(u interface{}) error {
+	err := validator.New().Struct(u)
+	if err == nil {
+		return nil
+	}
+	myErr := err.(validator.ValidationErrors)
+	errString := ""
+	for _, e := range myErr {
+		errString += e.Field() + " is " + e.Tag()
+	}
+	return errors.New(errString)
 }
 
 type UserUpdate struct {
@@ -15,8 +33,8 @@ type UserUpdate struct {
 	Password string
 }
 type UserLogin struct {
-	Email    string
-	Password string
+	Email    string `validate:"required"`
+	Password string `validate:"required"`
 }
 
 func (u *UserCreate) ParseToModel() *model.User {

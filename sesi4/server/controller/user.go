@@ -7,6 +7,7 @@ import (
 	"sesi4/server/service"
 	"sesi4/server/view"
 
+	"github.com/gin-gonic/gin"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -59,4 +60,59 @@ func (u *UserHandler) Login(w http.ResponseWriter, r *http.Request, _ httprouter
 
 	resp := u.svc.Login(&req)
 	WriteJsonResponse(w, resp)
+}
+
+func (u *UserHandler) GinGetUsers(c *gin.Context) {
+
+	resp := u.svc.GetUsers()
+
+	WriteJsonResponseGin(c, resp)
+
+}
+
+func (u *UserHandler) GinRegister(c *gin.Context) {
+	var req params.UserCreate
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
+		resp := view.ErrBadRequest(err.Error())
+		WriteJsonResponseGin(c, resp)
+		return
+	}
+
+	err = params.Validate(req)
+	if err != nil {
+		resp := view.ErrBadRequest(err.Error())
+		WriteJsonResponseGin(c, resp)
+		return
+	}
+
+	// if len(req.Fullname) < 5 {
+
+	// 	resp := view.ErrBadRequest("user name length must be greater than 4")
+	// 	WriteJsonResponseGin(c, resp)
+	// 	return
+	// }
+
+	resp := u.svc.CreateUser(&req)
+	WriteJsonResponseGin(c, resp)
+}
+
+func (u *UserHandler) GinLogin(c *gin.Context) {
+	var req params.UserLogin
+	err := c.ShouldBindJSON(&req)
+	if err != nil {
+		resp := view.ErrBadRequest(err.Error())
+		WriteJsonResponseGin(c, resp)
+		return
+	}
+
+	err = params.Validate(req)
+	if err != nil {
+		resp := view.ErrBadRequest(err.Error())
+		WriteJsonResponseGin(c, resp)
+		return
+	}
+
+	resp := u.svc.Login(&req)
+	WriteJsonResponseGin(c, resp)
 }

@@ -62,7 +62,7 @@ func (u *userRepo) Register(user *model.User) error {
 	if err != nil {
 		return err
 	}
-	tx.Rollback()
+	defer tx.Rollback()
 	query := `
 		INSERT INTO employees (
 			id, nip, name, address, email, password, created_at, updated_at
@@ -76,7 +76,7 @@ func (u *userRepo) Register(user *model.User) error {
 		return err
 	}
 
-	stmt.Close()
+	defer stmt.Close()
 
 	_, err = stmt.Exec(
 		user.Id, user.Nip, user.Fullname, user.Address,
