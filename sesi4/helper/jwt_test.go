@@ -23,15 +23,11 @@ func TestGenerateToken(t *testing.T) {
 }
 
 func TestVerifyToken(t *testing.T) {
-	tokString := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjp7InVzZXJfaWQiOiIxIiwiZW1haWwiOiJyZXloYW5AZ21haWwuY29tIn19.Y6KuJ5HcT8Tk2ZkWPJ7679xgVEeyLBGADsdiJ23NJi0"
+	tokString := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3N1ZWQiOiIyMDIyLTEwLTIzVDA5OjI5OjUzLjQyMDEyNCswNzowMCIsInBheWxvYWQiOnsidXNlcl9pZCI6IjEiLCJlbWFpbCI6InJleWhhbkBnbWFpbC5jb20ifX0.jK_wETyTKE1bAwEOl0rMy3zOwHhTh1SCuSooyIaqdw4"
 
 	myTok, err := VerifyToken(tokString)
 
 	assert.Nil(t, err)
-	// if err != nil {
-	// 	t.Errorf("fail to verify token with error :%s", err.Error())
-	// 	return
-	// }
 
 	fmt.Println("mytoken :", myTok)
 }

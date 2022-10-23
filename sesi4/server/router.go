@@ -16,9 +16,10 @@ type Router struct {
 }
 
 type GinRouter struct {
-	router *gin.Engine
-	user   *controller.UserHandler
-	menu   *controller.MenuHandler
+	router     *gin.Engine
+	user       *controller.UserHandler
+	menu       *controller.MenuHandler
+	middleware *Middleware
 }
 
 func NewRouter(router *httprouter.Router, user *controller.UserHandler) *Router {
@@ -27,11 +28,12 @@ func NewRouter(router *httprouter.Router, user *controller.UserHandler) *Router 
 		user:   user,
 	}
 }
-func NewRouterGin(router *gin.Engine, user *controller.UserHandler, menu *controller.MenuHandler) *GinRouter {
+func NewRouterGin(router *gin.Engine, user *controller.UserHandler, menu *controller.MenuHandler, middleware *Middleware) *GinRouter {
 	return &GinRouter{
-		router: router,
-		user:   user,
-		menu:   menu,
+		router:     router,
+		user:       user,
+		menu:       menu,
+		middleware: middleware,
 	}
 }
 
@@ -45,8 +47,10 @@ func (r *Router) Start(port string) {
 }
 
 func (r *GinRouter) Start(port string) {
+	r.router.Use(r.middleware.Trace)
+
 	emp := r.router.Group("/employees")
-	emp.GET("/", r.user.GinGetUsers)
+	emp.GET("/", r.middleware.Auth, r.middleware.CheckRole(r.user.GinGetUsers, []string{"admin"}))
 	emp.POST("/register", r.user.GinRegister)
 	emp.POST("/login", r.user.GinLogin)
 

@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"sesi4/server/params"
 	"sesi4/server/service"
@@ -63,7 +64,7 @@ func (u *UserHandler) Login(w http.ResponseWriter, r *http.Request, _ httprouter
 }
 
 func (u *UserHandler) GinGetUsers(c *gin.Context) {
-
+	fmt.Println("Log from ", c.GetString("USER_EMAIL"))
 	resp := u.svc.GetUsers()
 
 	WriteJsonResponseGin(c, resp)

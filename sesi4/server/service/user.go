@@ -39,6 +39,7 @@ func (u *UserServices) CreateUser(req *params.UserCreate) *view.Response {
 	user.Id = uuid.NewString()
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = time.Now()
+	user.Role = "member"
 
 	hash, err := helper.GeneratePassword(user.Password)
 	if err != nil {
@@ -80,4 +81,15 @@ func (u *UserServices) Login(req *params.UserLogin) *view.Response {
 	}
 
 	return view.SuccessCreated(tokString)
+}
+
+func (u *UserServices) FindUserByEmail(email string) *view.Response {
+	user, err := u.repo.FindUserByEmail(email)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return view.ErrNotFound()
+		}
+		return view.ErrInternalServer(err.Error())
+	}
+	return view.SuccessFindAll(user)
 }

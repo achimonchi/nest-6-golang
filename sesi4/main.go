@@ -28,8 +28,10 @@ func main() {
 	router := gin.Default()
 	router.Use(gin.Logger())
 
+	middleware := server.NewMiddleware(userSvc)
+
 	// app := server.NewRouter(router, userHandler)
-	app := server.NewRouterGin(router, userHandler, menuHandler)
+	app := server.NewRouterGin(router, userHandler, menuHandler, middleware)
 
 	app.Start(":4444")
 }

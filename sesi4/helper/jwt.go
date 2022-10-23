@@ -55,6 +55,17 @@ func VerifyToken(tokString string) (*Token, error) {
 	}
 
 	// TODO : verify issued token
+	issuedString := fmt.Sprintf("%v", claims["issued"])
+	issued, err := time.Parse(time.RFC3339, issuedString)
+	if err != nil {
+		return nil, err
+	}
+
+	// fmt.Println(time.Now(), issued, time.Now().After(issued), time.Now().Before(issued))
+
+	if time.Now().After(issued) {
+		return nil, errors.New("token expired")
+	}
 
 	byteClaims, err := json.Marshal(claims["payload"])
 	if err != nil {

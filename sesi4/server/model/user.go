@@ -14,6 +14,7 @@ type User struct {
 	Nip      string `json:"nip"`
 	Address  string `json:"address"`
 	Password string `json:"password"`
+	Role     string `json:"role"`
 }
 
 var Users = []User{}

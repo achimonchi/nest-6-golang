@@ -16,3 +16,7 @@ func WriteJsonResponse(w http.ResponseWriter, payload *view.Response) {
 func WriteJsonResponseGin(c *gin.Context, payload *view.Response) {
 	c.JSON(payload.Status, payload)
 }
+
+func WriteErrorJsonResponseGin(c *gin.Context, payload *view.Response) {
+	c.AbortWithStatusJSON(payload.Status, payload)
+}
