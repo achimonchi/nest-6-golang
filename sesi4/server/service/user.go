@@ -2,6 +2,8 @@ package service
 
 import (
 	"database/sql"
+	"log"
+	"sesi4/adaptor"
 	"sesi4/helper"
 	"sesi4/server/params"
 	"sesi4/server/repository"
@@ -12,12 +14,14 @@ import (
 )
 
 type UserServices struct {
-	repo repository.UserRepo
+	repo            repository.UserRepo
+	typicodeAdaptor *adaptor.TypicodeAdaptor
 }
 
-func NewServices(repo repository.UserRepo) *UserServices {
+func NewServices(repo repository.UserRepo, typicodeAdaptor *adaptor.TypicodeAdaptor) *UserServices {
 	return &UserServices{
-		repo: repo,
+		repo:            repo,
+		typicodeAdaptor: typicodeAdaptor,
 	}
 }
 
@@ -43,6 +47,7 @@ func (u *UserServices) CreateUser(req *params.UserCreate) *view.Response {
 
 	hash, err := helper.GeneratePassword(user.Password)
 	if err != nil {
+		log.Printf("get error when try to generate password %v\n", "")
 		return view.ErrInternalServer(err.Error())
 	}
 
@@ -50,10 +55,16 @@ func (u *UserServices) CreateUser(req *params.UserCreate) *view.Response {
 
 	err = u.repo.Register(user)
 	if err != nil {
+		log.Printf("get error register user with error %v\n", "")
 		return view.ErrInternalServer(err.Error())
 	}
 
-	return view.SuccessCreated(view.NewUserCreateResponse(user))
+	data, err := u.typicodeAdaptor.GetAllTypicode()
+	if err != nil {
+		return view.ErrInternalServer(err.Error())
+	}
+
+	return view.SuccessCreated(data)
 }
 
 func (u *UserServices) Login(req *params.UserLogin) *view.Response {

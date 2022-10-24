@@ -1,6 +1,7 @@
 package main
 
 import (
+	"sesi4/adaptor"
 	"sesi4/db"
 	"sesi4/server"
 	"sesi4/server/controller"
@@ -16,8 +17,10 @@ func main() {
 		panic(err)
 	}
 
+	typicodeAdaptor := adaptor.NewTypicodeAdaptor("https://jsonplaceholder.typicode.com/posts")
+
 	userRepo := gorm_postgres.NewUserRepoGormPostgres(db)
-	userSvc := service.NewServices(userRepo)
+	userSvc := service.NewServices(userRepo, typicodeAdaptor)
 	userHandler := controller.NewUserHandler(userSvc)
 
 	menuRepo := gorm_postgres.NewMenuRepoGormPostgres(db)
