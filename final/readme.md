@@ -28,7 +28,7 @@ Adapun, client ingin karyawan dan konsumennya nanti bisa melakukan hal hal berik
   - Membeli produk
 
 ## Architecture
-![Architecture](https:#res.cloudinary.com/noobeeid/image/upload/v1666584475/bootcamp/others/Screen_Shot_2022-10-24_at_11.07.40_dwcp1k.png)
+![Architecture](https://res.cloudinary.com/noobeeid/image/upload/v1666584475/bootcamp/others/Screen_Shot_2022-10-24_at_11.07.40_dwcp1k.png)
 - System dibuat menggunakan arsitektur monolith
 - Database yang digunakan adalah `MySQL` atau `PostgreSQL`
 - Terdapat 4 services, yaitu :
@@ -324,7 +324,7 @@ Jika gagal, maka akan menghasilkan response :
 }
 ```
 
-#### PUT /users/profile
+#### PUT /users/profile 
 Berfungsi untuk mengubah data user yang sedang login
 
 **Request Headers**
@@ -360,6 +360,215 @@ Jika gagal, maka akan menghasilkan response :
     "error" : "BAD_REQUEST",
     "additional_info" : {
         "message" : "invalid request payload", # or others 
+    },
+    "general_info" : "NooBee-Shop"
+}
+```
+
+
+### Product
+#### POST /products
+Berfungsi untuk menambah product baru. Endpoint ini hanya bisa di akses oleh `admin`
+
+**Request Headers**
+```bash
+Authorization : Bearer <token>
+```
+
+**Request Body**
+```json
+{
+    "name" : "string",
+    "category" : "string",
+    "description" : "string",
+    "price" : 0, 
+    "stock" : 0,
+    "img_url" : "string"
+}
+```
+**Notes** : untuk `img_url`, cukup lampirkan saja url dari image yang ada di google. 
+
+**Response Body**
+```json
+{
+    "status" : 201,
+    "message" : "CREATE_PRODUCT_SUCCESS",
+    "general_info" : "NooBee-Shop"
+}
+```
+Jika gagal, maka akan menghasilkan response :
+```json
+{
+    "status" : 403, # Bad request, or others...
+    "message" : "CREATE_PRODUCT_FAIL",
+    "error" : "FORBIDDEN_ACCESS",
+    "additional_info" : {
+        "message" : "you dont have access for this resources", # or others 
+    },
+    "general_info" : "NooBee-Shop"
+}
+```
+
+
+#### GET /products
+Berfungsi untuk melihat daftar product. 
+
+**Query String**
+- limit : `int` with default is 25  | optional
+- page  : `int` with default is 1   | optional
+
+**Response Body**
+```json
+{
+    "status" : 200,
+    "message" : "GET_ALL_PRODUCTS_SUCCESS",
+    "payload" : [
+        {
+            "id" : "string",
+            "name" : "string",
+            "category" : "string",
+            "description" : "string",
+            "price" : 0, 
+            "stock" : 0,
+            "img_url" : "string"
+        }
+    ],
+    "query" : {
+        "limit" : 25, # default is 25
+        "page" : 1, # default is 1
+        "total" : 3
+    }
+}
+```
+
+Jika gagal, maka akan menghasilkan response :
+```json
+{
+    "status" : 404, # Bad request, or others...
+    "message" : "GET_ALL_PRODUCTS_FAIL",
+    "error" : "NOT_FOUND",
+    "additional_info" : {
+        "message" : "data not found in this resources", # or others 
+    },
+    "general_info" : "NooBee-Shop"
+}
+```
+
+#### GET /products/id/:id
+Berfungsi untuk melihat detail product berdasarkan ID product. Endpoint ini hanya bisa di akses jika telah login
+
+**Params**
+- id : `string` | required
+
+**Request Headers**
+```bash
+Authorization : Bearer <token>
+```
+
+**Response Body**
+```json
+{
+    "status" : 200,
+    "message" : "GET_DETAIL_PRODUCT_SUCCESS",
+    "payload" : {
+        "id" : "string",
+        "name" : "string",
+        "category" : "string",
+        "description" : "string",
+        "price" : 0, 
+        "stock" : 0,
+        "img_url" : "string",
+        "created_at" : "timestamp",
+        "updated_at" : "timestamp"
+    }
+}
+```
+
+Jika gagal, maka akan menghasilkan response :
+```json
+{
+    "status" : 404, # Bad request, or others...
+    "message" : "GET_DETAIL_PRODUCT_FAIL",
+    "error" : "NOT_FOUND",
+    "additional_info" : {
+        "message" : "data not found in this resources", # or others 
+    },
+    "general_info" : "NooBee-Shop"
+}
+```
+
+
+#### PUT /products/id/:id
+Berfungsi untuk mengubah data dari product. Endpoint ini hanya bisa di akses oleh `admin`
+
+**Params**
+- id : `string` | required
+
+**Request Headers**
+```bash
+Authorization : Bearer <token>
+```
+
+**Request Body**
+```json
+{
+    "name" : "string",
+    "category" : "string",
+    "description" : "string",
+    "price" : 0, 
+    "stock" : 0,
+    "img_url" : "string"
+}
+```
+**Notes** : untuk `img_url`, cukup lampirkan saja url dari image yang ada di google. 
+
+**Response Body**
+```json
+{
+    "status" : 200,
+    "message" : "UPDATE_PRODUCT_SUCCESS",
+    "general_info" : "NooBee-Shop"
+}
+```
+Jika gagal, maka akan menghasilkan response :
+```json
+{
+    "status" : 403, # Bad request, or others...
+    "message" : "UPDATE_PRODUCT_FAIL",
+    "error" : "FORBIDDEN_ACCESS",
+    "additional_info" : {
+        "message" : "you dont have access for this resources", # or others 
+    },
+    "general_info" : "NooBee-Shop"
+}
+```
+
+#### DELETE /products/id/:id
+Berfungsi untuk menghapus product. Endpoint ini hanya bisa di akses oleh `admin`
+
+**Params**
+- id : `string` | required
+
+**Request Headers**
+```bash
+Authorization : Bearer <token>
+```
+
+```json
+{
+    "status" : 200,
+    "message" : "DELETE_PRODUCT_SUCCESS",
+    "general_info" : "NooBee-Shop"
+}
+```
+Jika gagal, maka akan menghasilkan response :
+```json
+{
+    "status" : 403, # Bad request, or others...
+    "message" : "DELETE_PRODUCT_FAIL",
+    "error" : "FORBIDDEN_ACCESS",
+    "additional_info" : {
+        "message" : "you dont have access for this resources", # or others 
     },
     "general_info" : "NooBee-Shop"
 }
