@@ -383,6 +383,7 @@ Authorization : Bearer <token>
     "description" : "string",
     "price" : 0, 
     "stock" : 0,
+    "weight" : 0, #gram
     "img_url" : "string"
 }
 ```
@@ -554,6 +555,7 @@ Berfungsi untuk menghapus product. Endpoint ini hanya bisa di akses oleh `admin`
 Authorization : Bearer <token>
 ```
 
+**Response Body**
 ```json
 {
     "status" : 200,
@@ -561,6 +563,8 @@ Authorization : Bearer <token>
     "general_info" : "NooBee-Shop"
 }
 ```
+**Notes** : Saat delete product, hanya mengubah status product dari `1` menjadi `0` atau biasa di sebut dengan `soft delete`.
+
 Jika gagal, maka akan menghasilkan response :
 ```json
 {
@@ -570,6 +574,257 @@ Jika gagal, maka akan menghasilkan response :
     "additional_info" : {
         "message" : "you dont have access for this resources", # or others 
     },
+    "general_info" : "NooBee-Shop"
+}
+```
+
+
+
+### Transaction
+#### POST /transactions/inquire
+Ini berfungsi untuk inquiry transaksi. Pada proses ini, akan dilakukan pengecekan untuk estimasi ongkos kirim. Proses ini hanya bisa dilakukan oleh `customer`.
+
+**Request Headers**
+```bash
+Authorization : Bearer <token>
+```
+
+**Request Body**
+```json
+{
+    "product_id" : "string",
+    "product_name" : "string",
+    "quantity" : "int",
+    "destination" : "int", #id dari kota customer
+    "weight" : "int", #calculation dari quantity * product_weight
+    "total_price" : "int", #calculation dari price * quantity
+    "courier" : "string", #silahkan cek di Raja Ongkir
+}
+```
+**Notes** : Pada proses ini, akan melakukan pengecekan ke stok product, apakah stok masih tersedia atau tidak. Dan juga akan melakukan pengecekan untuk estimasi ongkos kirim ke ***API Raja Ongkir***
+
+**Response Body**
+```json
+{
+    "status" : 200,
+    "message" : "INQUIRY_TRANSACTION_SUCCESS",
+    "payload" : {
+        "product" : {
+            "id" : "string",
+            "name" : "string", 
+            "img_url" : "string",
+            "price" : "int"
+        },
+        "quantity" : "int",
+        "destination" : "int", 
+        "weight" : "int", 
+        "total_price" : "int", 
+        "servcies_courier" : [ #this result is from Raja Ongkir
+            {
+                "code" : "string", #code courier
+                "name" : "string",
+                "costs" : [
+                    {
+                        "services" : "string",
+                        "description" : "string",
+                        "cost" : [
+                            {
+                                "value" : "int",
+                                "estimation" : "string", #in days
+                                "note" : "string"  
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    "general_info" : "NooBee-Shop"
+}
+```
+
+Jika gagal, maka akan menghasilkan response :
+```json
+{
+    "status" : 422, # Unprocessable entity, or others...
+    "message" : "INQUIRY_TRANSACTION_FAIL",
+    "error" : "UNPROCESSABLE_ENTITY",
+    "additional_info" : {
+        "message" : "stock prodcut not enough", # or others 
+    },
+    "general_info" : "NooBee-Shop"
+}
+```
+
+#### POST /transactions/confirm
+Ini berfungsi untuk confirmation transaction. Pada proses ini, akan dilakukan proses update stok pada produk dan insert ke table transactions. Proses ini hanya bisa dilakukan oleh `customer`.
+
+**Request Headers**
+```bash
+Authorization : Bearer <token>
+```
+
+**Request Body**
+```json
+{
+    "product_id" : "string",
+    "product_name" : "string",
+    "quantity" : "int",
+    "destination" : "int", #id dari kota customer
+    "weight" : "int", #calculation dari quantity * product_weight
+    "total_price" : "int", #calculation dari price * quantity
+    "courier" : {
+        "code" : "string", #silahkan cek di Raja Ongkir
+        "service" : "string", #OKE, REG, atau yang lainnya
+        "cost" : "int",
+        "estimation" : "string"
+    }
+}
+```
+**Notes** : Pada proses ini, akan melakukan pengecekan ke stok product, apakah stok masih tersedia atau tidak. Dan juga akan melakukan pengecekan untuk estimasi ongkos kirim ke ***API Raja Ongkir***. Secara default, status yang di set adalah `WAITING`
+
+**Response Body**
+```json
+{
+    "status" : 200,
+    "message" : "CONFIRM_TRANSACTION_SUCCESS",
+    "general_info" : "NooBee-Shop"
+}
+```
+
+
+Jika gagal, maka akan menghasilkan response :
+```json
+{
+    "status" : 403, # Bad request, or others...
+    "message" : "CONFIRM_TRANSACTION_FAIL",
+    "error" : "FORBIDDEN_ACCESS",
+    "additional_info" : {
+        "message" : "you dont have access for this resources", # or others 
+    },
+    "general_info" : "NooBee-Shop"
+}
+```
+
+
+#### GET /transactions/histories/me
+Ini berfungsi untuk melihat riwayat transaction si customer yang sedang login.
+
+**Query String**
+- limit : `int` with default is 25  | optional
+- page  : `int` with default is 1   | optional
+
+**Request Headers**
+```bash
+Authorization : Bearer <token>
+```
+
+**Response Body**
+```json
+{
+    "status" : 200,
+    "message" : "GET_TRANSACTION_HISTORIES_SUCCESS",
+    "payload" : [
+        {
+            "id" : "string",
+            "product_id" : "string",
+            "product_name" : "string",
+            "quantity": "string",
+            "destination": {
+                "city" : "string",
+                "province" : "string",
+            },
+            "weight" : "int",
+            "total_price" : "int",
+            "courier" : {
+                "code" : "string", 
+                "service" : "string",
+                "cost" : "int",
+                "estimation" : "string"
+            },
+            "status" : "string", #waiting, pickup, on the way, arrived. 
+            "estimation_arrived" : "string",
+            "created_at" : "timestamp",
+            "updated_at" : "timestamp",
+        }
+    ],
+     "query" : {
+        "limit" : 25, # default is 25
+        "page" : 1, # default is 1
+        "total" : 3
+    }
+    "general_info" : "NooBee-Shop"
+}
+```
+
+#### GET /transactions/histories/list
+Ini berfungsi untuk melihat riwayat transaction seluruh user. Endpoint ini hanya bisa di akses oleh `admin` dan `kasir`.
+
+**Query String**
+- limit : `int` with default is 25  | optional
+- page  : `int` with default is 1   | optional
+
+**Request Headers**
+```bash
+Authorization : Bearer <token>
+```
+
+**Response Body**
+```json
+{
+    "status" : 200,
+    "message" : "GET_TRANSACTION_HISTORIES_SUCCESS",
+    "payload" : [
+        {
+            "id" : "string",
+            "product_id" : "string",
+            "product_name" : "string",
+            "quantity": "string",
+            "destination": {
+                "city" : "string",
+                "province" : "string",
+            },
+            "weight" : "int",
+            "total_price" : "int",
+            "status" : "string", #waiting, pickup, on the way, arrived
+            "created_at" : "timestamp",
+            "updated_at" : "timestamp",
+        }
+    ],
+     "query" : {
+        "limit" : 25, # default is 25
+        "page" : 1, # default is 1
+        "total" : 3
+    }
+    "general_info" : "NooBee-Shop"
+}
+```
+
+#### PUT /transactions/id/:id/status
+Ini berfungsi untuk mengubah status transaksi customer. endpoint ini hanya bisa di akses oleh `kasir`
+
+**Request Headers**
+```bash
+Authorization : Bearer <token>
+```
+
+**Request Body**
+```json
+{
+    "status" : "string"
+}
+```
+List status : 
+- WAITING 
+- PICKUP
+- ON THE WAY
+- ARRIVED
+
+**Response Body**
+```json
+{
+    "status" : 200,
+    "message" : "UPDATE_STATUS_TRANSACTION_SUCCESS",
     "general_info" : "NooBee-Shop"
 }
 ```
